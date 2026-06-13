@@ -1,0 +1,8 @@
+name: Undying Pets
+version: '1.0.0.0'
+main: io.github.derexxd.undyingPets.UndyingPets
+api-version: '1.18'
+prefix: DerexXD
+authors: [ DerexXD, Atlasplays ]
+description: Let pets equip Totem of Undying
+website: https://www.derekchen.dev/
