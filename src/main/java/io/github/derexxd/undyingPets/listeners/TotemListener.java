@@ -44,6 +44,7 @@ public class TotemListener implements Listener {
             return;
         }
 
+        // use pdc so it cant be overwritten
         pet.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
 
         // consume one totem
@@ -55,7 +56,7 @@ public class TotemListener implements Listener {
             player.getInventory().setItemInMainHand(hand);
         }
 
-        player.sendMessage(ChatColor.GREEN + "Equipped Totem of Undying on your pet.");
+        player.sendActionBar("Equipped Totem onto pet");
         event.setCancelled(true);
     }
 }
