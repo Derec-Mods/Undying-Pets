@@ -2,6 +2,7 @@ package io.github.derexxd.undyingPets.listeners;
 
 import io.github.derexxd.undyingPets.UndyingPets;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -36,7 +37,7 @@ public class TotemListener implements Listener {
 
         if (!(clicked instanceof Tameable pet)) return;
 
-        if (pet.getOwner() == null || !pet.getOwner().equals(player)) return;
+        if (pet.getOwner() == null || !player.getUniqueId().equals(pet.getOwner().getUniqueId())) return;
 
         if (pet.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
             player.sendActionBar(Component.text("Pet already has a Totem equipped"));
@@ -46,12 +47,14 @@ public class TotemListener implements Listener {
 
         pet.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
 
-        int amount = item.getAmount();
-        if (amount <= 1) {
-            player.getInventory().setItem(slot, null);
-        } else {
-            item.setAmount(amount - 1);
-            player.getInventory().setItem(slot, item);
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            int amount = item.getAmount();
+            if (amount <= 1) {
+                player.getInventory().setItem(slot, null);
+            } else {
+                item.setAmount(amount - 1);
+                player.getInventory().setItem(slot, item);
+            }
         }
 
         player.sendActionBar(Component.text("Equipped Totem onto pet"));
@@ -60,6 +63,8 @@ public class TotemListener implements Listener {
 
     @EventHandler
     public void onEntityResurrect(EntityResurrectEvent event) {
+        if (!event.isCancelled()) return;
+
         if (!(event.getEntity() instanceof Tameable pet)) return;
 
         if (!pet.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) return;
