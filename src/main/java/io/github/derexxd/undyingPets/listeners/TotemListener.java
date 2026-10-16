@@ -1,6 +1,7 @@
 package io.github.derexxd.undyingPets.listeners;
 
 import io.github.derexxd.undyingPets.UndyingPets;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -24,35 +25,36 @@ public class TotemListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        EquipmentSlot slot = event.getHand();
+        if (slot != EquipmentSlot.HAND && slot != EquipmentSlot.OFF_HAND) return;
 
         Player player = event.getPlayer();
         Entity clicked = event.getRightClicked();
 
-        ItemStack hand = player.getInventory().getItemInMainHand();
-        if (hand == null || hand.getType() != Material.TOTEM_OF_UNDYING) return;
+        ItemStack item = player.getInventory().getItem(slot);
+        if (item == null || item.getType() != Material.TOTEM_OF_UNDYING) return;
 
         if (!(clicked instanceof Tameable pet)) return;
 
         if (pet.getOwner() == null || !pet.getOwner().equals(player)) return;
 
         if (pet.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
-            player.sendActionBar("Pet already has a Totem equipped");
+            player.sendActionBar(Component.text("Pet already has a Totem equipped"));
             event.setCancelled(true);
             return;
         }
 
         pet.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
 
-        int amount = hand.getAmount();
+        int amount = item.getAmount();
         if (amount <= 1) {
-            player.getInventory().setItemInMainHand(null);
+            player.getInventory().setItem(slot, null);
         } else {
-            hand.setAmount(amount - 1);
-            player.getInventory().setItemInMainHand(hand);
+            item.setAmount(amount - 1);
+            player.getInventory().setItem(slot, item);
         }
 
-        player.sendActionBar("Equipped Totem onto pet");
+        player.sendActionBar(Component.text("Equipped Totem onto pet"));
         event.setCancelled(true);
     }
 
