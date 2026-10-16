@@ -1,4 +1,4 @@
-name: Undying Pets
+name: UndyingPets
 version: '1.0.0.0'
 main: io.github.derexxd.undyingPets.UndyingPets
 api-version: '1.18'

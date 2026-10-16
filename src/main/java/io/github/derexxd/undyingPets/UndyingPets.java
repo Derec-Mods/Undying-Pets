@@ -5,11 +5,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class UndyingPets extends JavaPlugin {
+public class UndyingPets extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         getServer().getPluginManager().registerEvents(new TotemListener(this), this);
 
         Bukkit.getLogger().info("");
@@ -22,6 +21,5 @@ public final class UndyingPets extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
     }
 }

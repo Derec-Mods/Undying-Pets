@@ -1,7 +1,6 @@
 package io.github.derexxd.undyingPets.listeners;
 
 import io.github.derexxd.undyingPets.UndyingPets;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -9,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -24,30 +24,26 @@ public class TotemListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
-        }
+        if (event.getHand() != EquipmentSlot.HAND) return;
 
         Player player = event.getPlayer();
         Entity clicked = event.getRightClicked();
 
         ItemStack hand = player.getInventory().getItemInMainHand();
-        if (hand == null || hand.getType() != Material.TOTEM_OF_UNDYING) {
+        if (hand == null || hand.getType() != Material.TOTEM_OF_UNDYING) return;
+
+        if (!(clicked instanceof Tameable pet)) return;
+
+        if (pet.getOwner() == null || !pet.getOwner().equals(player)) return;
+
+        if (pet.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+            player.sendActionBar("Pet already has a Totem equipped");
+            event.setCancelled(true);
             return;
         }
 
-        if (!(clicked instanceof Tameable pet)) {
-            return;
-        }
-
-        if (pet.getOwner() == null || !pet.getOwner().equals(player)) {
-            return;
-        }
-
-        // use pdc so it cant be overwritten
         pet.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
 
-        // consume one totem
         int amount = hand.getAmount();
         if (amount <= 1) {
             player.getInventory().setItemInMainHand(null);
@@ -59,4 +55,15 @@ public class TotemListener implements Listener {
         player.sendActionBar("Equipped Totem onto pet");
         event.setCancelled(true);
     }
+
+    @EventHandler
+    public void onEntityResurrect(EntityResurrectEvent event) {
+        if (!(event.getEntity() instanceof Tameable pet)) return;
+
+        if (!pet.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) return;
+
+        pet.getPersistentDataContainer().remove(key);
+        event.setCancelled(false);
+    }
 }
+
